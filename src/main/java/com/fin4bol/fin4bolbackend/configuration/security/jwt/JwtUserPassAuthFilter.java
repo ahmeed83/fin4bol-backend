@@ -1,0 +1,101 @@
+package com.fin4bol.fin4bolbackend.configuration.security.jwt;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fin4bol.fin4bolbackend.configuration.security.config.JwtConfig;
+import com.fin4bol.fin4bolbackend.exception.security.UserNotAuthenticatedException;
+import io.jsonwebtoken.Jwts;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.SneakyThrows;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.io.IOException;
+import java.security.Key;
+import java.util.Date;
+
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+
+/**
+ * This filter will be executed when the user tries to log in. It will generate a token and send it back to the user.
+ */
+public class JwtUserPassAuthFilter extends UsernamePasswordAuthenticationFilter {
+
+    private final AuthenticationManager authenticationManager;
+    private final Key key;
+    private final JwtConfig jwtConfig;
+
+    public JwtUserPassAuthFilter(AuthenticationManager authenticationManager,
+                                 Key key,
+                                 JwtConfig jwtConfig) {
+        this.key = key;
+        this.authenticationManager = authenticationManager;
+        this.jwtConfig = jwtConfig;
+    }
+
+    /**
+     * Attempt to authenticate the user.
+     *
+     * @param request  req
+     * @param response res
+     * @return Authentication
+     * @throws AuthenticationException AuthenticationException
+     */
+    @SneakyThrows
+    @Override
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
+            throws AuthenticationException {
+        try {
+            final UserPassAuthRequest authenticationRequest =
+                    new ObjectMapper().readValue(request.getInputStream(), UserPassAuthRequest.class);
+
+            Authentication authentication =
+                    new UsernamePasswordAuthenticationToken(authenticationRequest.userName,
+                            authenticationRequest.password);
+            return authenticationManager.authenticate(authentication);
+        } catch (IOException e) {
+            throw new UserNotAuthenticatedException(e);
+        }
+    }
+
+    /**
+     * This method will be executed only if the attempt method successfully ends. This method will build the token and
+     * send it back to the customer.
+     *
+     * @param request    req
+     * @param response   res
+     * @param chain      chain
+     * @param authResult authResult
+     */
+    @Override
+    protected void successfulAuthentication(HttpServletRequest request,
+                                            HttpServletResponse response,
+                                            FilterChain chain,
+                                            Authentication authResult) {
+        final var tokenPrefix = jwtConfig.getTokenPrefix();
+        final var expirationAfterDays = jwtConfig.getTokenExpirationAfterDays();
+        final String token = Jwts.builder()
+                .subject(authResult.getName())
+                .claim("authorities", authResult.getAuthorities())
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + (long) expirationAfterDays * 1000 * 60 * 60 * 24))
+                .signWith(key)
+                .compact();
+
+        authResult.getAuthorities()
+                .stream()
+                .filter(x -> x.getAuthority() != null && x.getAuthority().length() > 5 && x.getAuthority()
+                        .startsWith("ROLE_"))
+                .findFirst()
+                .ifPresent((role -> response.addHeader("user", role.getAuthority().substring(5).toLowerCase())));
+        response.addHeader(AUTHORIZATION, tokenPrefix + token);
+    }
+
+    record UserPassAuthRequest(String userName, String password) {
+    }
+
+}

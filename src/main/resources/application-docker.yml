@@ -1,0 +1,36 @@
+server:
+  port: 5000
+
+app:
+  datasource:
+    jdbc-url: jdbc:postgresql://fin4bol-db:5432/fin4bol
+    username: fin4bol
+    password: fin4bol
+    dialect: org.hibernate.dialect.PostgreSQLDialect
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+
+
+# JWT configuration
+application:
+  jwt:
+    secretKey: jMC5hUk9qBQIQ9CKlDifBmkPOquKnfUzb5dYYAmxnpk=
+    tokenPrefix: 'Bearer '
+    tokenExpirationAfterDays: 14
+
+
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 387639245575-5oerkp07qdn323cqbe03t3di3lnk0uc6.apps.googleusercontent.com
+            client-secret: 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
+          facebook:
+            client-id: 1234567890
+            client-secret: abcdefgh
+  flyway:
+    out-of-order: true

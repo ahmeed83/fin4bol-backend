@@ -1,0 +1,23 @@
+---
+server:
+  servlet:
+    context-path: /api
+
+application:
+  version: "${version:@project.version@}"
+
+spring:
+  application:
+    name: 3D Webshop
+  profiles:
+    active: "@activatedProperties@"
+  cache:
+    cache-names:
+      - rate-limit-buckets
+    caffeine:
+      spec: maximumSize=100000,expireAfterAccess=3600s
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 5MB
+      max-request-size: 5MB

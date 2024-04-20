@@ -1,0 +1,34 @@
+version: "3"
+
+services:
+  database:
+    build: ../containers/fin4bol-db
+    container_name: fin4bol-db
+    restart: always
+    volumes:
+      - ../../_database-model/target:/docker-entrypoint-initdb.d/:ro
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    environment:
+      POSTGRES_USER: fin4bol
+      POSTGRES_PASSWORD: fin4bol
+      POSTGRES_DB: fin4bol
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fin4bol"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  fin4bol_api:
+    build: ../containers/fin4bol-api
+    ports:
+      - "9090:9090"
+      - "5015:5015"
+    environment:
+      - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5015
+      # - VALUE_OF_ACCOUNTAPI_APIKEY=${VALUE_OF_ACCOUNTAPI_APIKEY}
+    volumes:
+      - ../../target/fin4bol.jar:/application/fin4bol.jar:ro
+    restart: always
+    depends_on:
+      - database

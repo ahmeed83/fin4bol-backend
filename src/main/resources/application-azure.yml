@@ -1,0 +1,25 @@
+---
+
+app:
+  datasource:
+    #    jdbc-url: jdbc:postgresql://fin4bol-db:5432/fin4bol
+    jdbc-url: jdbc:postgresql://localhost/fin4bol
+    username: rsjyoiocnu
+    password: P2dk6k$Iy7paAiso
+    dialect: org.hibernate.dialect.PostgreSQLDialect
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+
+# JWT configuration
+application:
+  jwt:
+    secretKey: jMC5hUk9qBQIQ9CKlDifBmkPOquKnfUzb5dYYAmxnpk=
+    tokenPrefix: 'Bearer '
+    tokenExpirationAfterDays: 1
+
+
+spring:
+  flyway:
+    out-of-order: true
