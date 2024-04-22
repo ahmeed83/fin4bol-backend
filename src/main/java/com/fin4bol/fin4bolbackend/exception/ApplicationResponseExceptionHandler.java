@@ -14,11 +14,10 @@ public class ApplicationResponseExceptionHandler extends ResponseEntityException
 
     @ExceptionHandler(ApplicationException.class)
     public ResponseEntity<ApplicationErrorResponse> customCategory(ApplicationException ex) {
-        ZonedDateTime zonedDateTime = ZonedDateTime.now(TimeZone.getTimeZone("Asia/Baghdad").toZoneId());
+        ZonedDateTime zonedDateTime = ZonedDateTime.now(TimeZone.getTimeZone("Europe/Amsterdam").toZoneId());
         ApplicationErrorResponse errors = new ApplicationErrorResponse();
         errors.setTimestamp(LocalDateTime.from(zonedDateTime));
         errors.setErrorMessage(ex.getMessage());
-        errors.setStatus(ex.getStatus().value());
         return new ResponseEntity<>(errors, ex.getStatus());
     }
 }

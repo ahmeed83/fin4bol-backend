@@ -2,13 +2,14 @@ package com.fin4bol.fin4bolbackend.configuration.security.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fin4bol.fin4bolbackend.configuration.security.config.JwtConfig;
-import com.fin4bol.fin4bolbackend.exception.security.UserNotAuthenticatedException;
+import com.fin4bol.fin4bolbackend.exception.security.CustomAuthenticationFailureHandler;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.SneakyThrows;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -35,6 +36,7 @@ public class JwtUserPassAuthFilter extends UsernamePasswordAuthenticationFilter 
         this.key = key;
         this.authenticationManager = authenticationManager;
         this.jwtConfig = jwtConfig;
+        this.setAuthenticationFailureHandler(new CustomAuthenticationFailureHandler());
     }
 
     /**
@@ -58,7 +60,14 @@ public class JwtUserPassAuthFilter extends UsernamePasswordAuthenticationFilter 
                             authenticationRequest.password);
             return authenticationManager.authenticate(authentication);
         } catch (IOException e) {
-            throw new UserNotAuthenticatedException(e);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setContentType("application/json");
+            try {
+                response.getWriter().write("{\"error\":\"Internal server error - " + e.getMessage() + "\"}");
+            } catch (IOException ioException) {
+                logger.error("Failed to handle internal server error", ioException);
+            }
+            throw new AuthenticationServiceException("Error processing request", e);
         }
     }
 

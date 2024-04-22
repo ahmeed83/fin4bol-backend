@@ -1,23 +1,14 @@
 package com.fin4bol.fin4bolbackend.exception.security;
 
+import com.fin4bol.fin4bolbackend.exception.ApplicationException;
+import org.springframework.http.HttpStatus;
+
 /**
  * Super Exception class for the user management.
  */
-public class UserAuthenticationException extends Exception {
+public class UserAuthenticationException extends ApplicationException {
 
-    private final String message;
-
-    public UserAuthenticationException(String message) {
-        this.message = message;
-    }
-
-    public UserAuthenticationException(String message, Throwable cause) {
-        super(cause);
-        this.message = message;
-    }
-
-    @Override
-    public String getMessage() {
-        return message;
+    public UserAuthenticationException() {
+        super("User authentication failed", HttpStatus.UNAUTHORIZED);
     }
 }

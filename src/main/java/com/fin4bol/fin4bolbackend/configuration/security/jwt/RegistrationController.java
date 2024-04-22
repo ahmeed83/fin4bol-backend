@@ -23,10 +23,9 @@ public class RegistrationController {
      *
      * @param newUser new user
      * @return ResponseEntity
-     * @throws Exception Exception
      */
     @PostMapping("sign-up")
-    public ResponseEntity<?> registerNewUser(@RequestBody ApplicationUser newUser) throws Exception {
+    public ResponseEntity<Void> registerNewUser(@RequestBody ApplicationUser newUser) {
         applicationUserService.saveApplicationUser(newUser);
         return ResponseEntity.ok().build();
     }
