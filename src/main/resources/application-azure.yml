@@ -1,11 +1,12 @@
 ---
+server:
+  port: 80
 
 app:
   datasource:
-    #    jdbc-url: jdbc:postgresql://fin4bol-db:5432/fin4bol
-    jdbc-url: jdbc:postgresql://localhost/fin4bol
-    username: rsjyoiocnu
-    password: P2dk6k$Iy7paAiso
+    jdbc-url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     dialect: org.hibernate.dialect.PostgreSQLDialect
   jpa:
     generate-ddl: true
@@ -15,9 +16,9 @@ app:
 # JWT configuration
 application:
   jwt:
-    secretKey: jMC5hUk9qBQIQ9CKlDifBmkPOquKnfUzb5dYYAmxnpk=
+    secretKey: ${JWT_SECRET_KEY}
     tokenPrefix: 'Bearer '
-    tokenExpirationAfterDays: 1
+    tokenExpirationAfterDays: ${JWT_EXPIRATION_DAYS}
 
 
 spring:

@@ -8,7 +8,7 @@ application:
 
 spring:
   application:
-    name: 3D Webshop
+    name: Fin 4 Bol
   profiles:
     active: "@activatedProperties@"
   cache:

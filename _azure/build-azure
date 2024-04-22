@@ -1,0 +1,103 @@
+#!/bin/sh
+
+TIMESTAMP=$(date +%Y%m%dT%H%M%S)
+
+case $(uname) in
+Darwin)
+    export JAVA_HOME=$HOME/.sdkman/candidates/java/current
+    echo "java-home: $JAVA_HOME"
+    ;;
+*)
+    echo "not supported platform for java 21"
+    exit
+    ;;
+esac
+
+exit_on_non_existing_tag() {
+    echo
+    echo "you try to build a non exiting tag $1"
+    echo
+    exit
+}
+
+exit_on_usage() {
+    echo
+    echo "usage build-azure [snapshot|prd] <version-tag>"
+    echo
+    exit
+}
+
+docker_build() {
+    echo "Prepare docker with version '$2' and image $TIMESTAMP"
+    [ -d _azure/target ] && rm -r _azure/target
+    mkdir -p _azure/target/container/application/config
+    cp _azure/config/Dockerfile _azure/target/container/
+    cp ./target/fin4bol.jar _azure/target/container/application/fin4bol.jar
+
+    echo " >> docker build image: fin4bol-$2"
+    ( cd _azure/target || exit ; docker build --no-cache -t fin4bol-$1-$2 container)
+
+    case $1 in
+    snapshot)
+        echo " >> docker tag image to azure: snapshot"
+#        docker tag fin4bol-$1-$2 azizcode/fin4bol:$1-$2-$3
+        docker tag fin4bol-$1-$2 azizcode/fin4bol:latest
+        ;;
+    prd)
+        echo " >> docker tag image to azure: prd"
+        docker tag fin4bol-$1-$2 azizcode/fin4bol:$1-$2-$3
+        ;;
+    esac
+}
+
+docker_push() {
+case $1 in
+    snapshot)
+        echo " >> docker push image: azizcode/fin4bol:latest"
+        docker push azizcode/fin4bol:latest
+        az login
+        echo " >> docker deployment on webapp service"
+        az account set --subscription 558442db-ea39-4e94-8938-2b01b097ec03
+        az account list --output table | grep True
+        az webapp config container set \
+          --name fin4bol \
+          --resource-group finance4bol-resource-group \
+          --docker-custom-image-name azizcode/fin4bol/fin4bol:latest \
+          --docker-registry-server-url https://index.docker.io
+        ;;
+    *)
+        echo " >> docker push image: azizcode/fin4bol:$1-$2-$3"
+        docker push azizcode/fin4bol:$1-$2-$3
+#        echo " >> docker verify repository"
+#        az acr repository show-manifests --name azizcode --repository fin4bol --output table
+        echo "check"
+        exit
+        ;;
+esac
+}
+
+case $1 in
+snapshot)
+    echo
+    echo "BUILD docker with version '$2' and image $TIMESTAMP"
+    echo
+    mvn -Dmaven.test.skip=true clean package
+    ;;
+prd)
+    echo
+    echo "BUILD docker with version '$2' and image $TIMESTAMP"
+    echo
+    git checkout krs-$2 || exit_on_non_existing_tag krs-$2
+    mvn -Dmaven.test.skip=true clean package
+    ;;
+*)
+    exit_on_usage $1 $2
+    ;;
+esac
+
+echo "BUILD login azure"
+docker_build $1 $2 $TIMESTAMP
+docker_push $1 $2 $TIMESTAMP
+echo
+echo "docker with version $2 and image $TIMESTAMP"
+echo

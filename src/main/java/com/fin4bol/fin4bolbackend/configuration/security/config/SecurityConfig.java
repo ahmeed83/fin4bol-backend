@@ -1,8 +1,8 @@
 package com.fin4bol.fin4bolbackend.configuration.security.config;
 
-import com.fin4bol.fin4bolbackend.service.ApplicationUserService;
 import com.fin4bol.fin4bolbackend.configuration.security.jwt.JwtTokenVerifier;
 import com.fin4bol.fin4bolbackend.configuration.security.jwt.JwtUserPassAuthFilter;
+import com.fin4bol.fin4bolbackend.service.ApplicationUserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -70,7 +70,8 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3000")
+                        .allowedOrigins("http://localhost:3000",
+                                "https://fin4bolstorageaccount.blob.core.windows.net")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .exposedHeaders("Authorization", "user")
