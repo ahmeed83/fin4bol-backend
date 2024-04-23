@@ -58,7 +58,8 @@ public class ApplicationUserService implements UserDetailsService {
         ApplicationUser user = ApplicationUser.builder()
                 .email(applicationUser.getEmail())
                 .password(applicationUser.getPassword())
-                .name(applicationUser.getName() == null ? applicationUser.getEmail() : applicationUser.getName())
+                .name(applicationUser.getName() == null || applicationUser.getName().isEmpty()
+                        ? applicationUser.getEmail() : applicationUser.getName())
                 .referralSource(applicationUser.getReferralSource())
                 .build();
         applicationUserPrincipalRepository.saveApplicationUser(user);

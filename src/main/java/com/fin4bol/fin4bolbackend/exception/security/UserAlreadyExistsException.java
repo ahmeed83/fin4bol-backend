@@ -9,6 +9,6 @@ import org.springframework.http.HttpStatus;
 public class UserAlreadyExistsException extends ApplicationException {
 
     public UserAlreadyExistsException() {
-        super("User already exists", HttpStatus.CONFLICT);
+        super("User already exists, please try with different email", HttpStatus.CONFLICT);
     }
 }
