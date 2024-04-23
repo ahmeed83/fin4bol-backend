@@ -93,7 +93,9 @@ public class ExcelMapperService {
                                          final PerformanceRapport performanceRapport) {
         Performance performance = new Performance();
         performance.setPerformanceRapport(performanceRapport);
-        performance.setCreatedAt(LocalDateTime.now());
+        final LocalDateTime now = LocalDateTime.now();
+        performance.setCreatedAt(now);
+        performance.setUpdatedAt(now);
         performance.setName(product.getName());
         performance.setEanNumber(product.getEanNumber());
         performance.setPurchaseCost(product.getPurchaseCost());

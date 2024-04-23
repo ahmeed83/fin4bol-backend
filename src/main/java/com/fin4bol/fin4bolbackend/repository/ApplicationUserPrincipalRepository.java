@@ -72,8 +72,10 @@ public class ApplicationUserPrincipalRepository {
      * @throws UserAuthenticationException user exception
      */
     public void saveApplicationUser(ApplicationUser applicationUser) throws UserAuthenticationException {
+        final LocalDateTime now = LocalDateTime.now();
+        applicationUser.setCreatedAt(now);
+        applicationUser.setUpdatedAt(now);
         applicationUser.setEnabled(true);
-        applicationUser.setCreatedAt(LocalDateTime.now());
         applicationUser.setPassword(passwordEncoder.encode(applicationUser.getPassword()));
         applicationUser.setRole(CUSTOMER.getRole());
         userRepository.save(applicationUser);

@@ -3,17 +3,11 @@ package com.fin4bol.fin4bolbackend.repository.entiry;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "performance")
@@ -21,8 +15,9 @@ import java.time.LocalDateTime;
 @Setter
 public class Performance extends BaseModel {
 
+    @Column(name = "name", length = 200, nullable = false)
     private String name;
-    @Column(name = "ean", length = 20)
+    @Column(name = "ean", nullable = false, length = 20)
     private String eanNumber;
     private Double purchaseCost;
     private Double averagePricePerProduct;

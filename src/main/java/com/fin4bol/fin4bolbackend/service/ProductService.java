@@ -40,8 +40,9 @@ public class ProductService {
         Product productEntity = new Product();
         productEntity.setApplicationUserId(applicationUser);
         productEntity.setName(productJson.getName());
-        productEntity.setCreatedAt(LocalDateTime.now());
-        productEntity.setUpdatedAt(LocalDateTime.now());
+        final LocalDateTime now = LocalDateTime.now();
+        productEntity.setCreatedAt(now);
+        productEntity.setUpdatedAt(now);
         productEntity.setEanNumber(productJson.getToUpdateEanNumber());
         productEntity.setPurchaseCost(productJson.getPurchaseCost());
         productRepository.save(productEntity);

@@ -17,14 +17,13 @@ import lombok.Setter;
 @Setter
 public class Product extends BaseModel {
 
-
-    @Column(name = "name", length = 200)
+    @Column(name = "name", length = 200, nullable = false)
     private String name;
 
     @Column(name = "ean", nullable = false, length = 20)
-    private String eanNumber; // EAN-nummer
+    private String eanNumber;
 
-    @Column(name = "purchaseCost", length = 10)
+    @Column(name = "purchaseCost", length = 10, nullable = false)
     private Double purchaseCost; // Inkoopkosten
 
     @ManyToOne
