@@ -14,7 +14,7 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
     String errorMessage = """
             {
                 "timestamp": "%s",
-                "errorMessage": "Unauthorized - %s",
+                "errorMessage": "Unauthorized - %s"
             }
             """;
 
@@ -26,6 +26,5 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
         response.setCharacterEncoding("UTF-8");
         final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         response.getWriter().write(String.format(errorMessage, LocalDateTime.now().format(dateTimeFormatter), exception.getMessage()));
-
     }
 }
