@@ -6,7 +6,6 @@ import lombok.Data;
 
 @Data
 public class ApplicationUserJson {
-
     @NotBlank(message = "Email is required")
     @Email(message = "Email must be valid")
     private String email;
@@ -14,7 +13,6 @@ public class ApplicationUserJson {
     private String password;
     @NotBlank(message = "Password confirmation is required")
     private String passwordConfirm;
-    @NotBlank(message = "Name is required")
     private String name;
     private String referralSource;
 }
