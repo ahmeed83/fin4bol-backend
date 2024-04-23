@@ -48,12 +48,12 @@ public class ApplicationUserPrincipalRepository {
     /**
      * Find the user by its name. This method will be used by Spring to load the user from the database.
      *
-     * @param userName userName
+     * @param email email
      * @return ApplicationUserPrincipal
      */
-    public Optional<ApplicationUserPrincipal> findUserByUserName(String userName) {
-        final var applicationUser = userRepository.findByEmail(userName)
-                .orElseThrow(() -> new UsernameNotFoundException(userName));
+    public Optional<ApplicationUserPrincipal> findUserByEmail(String email) {
+        final var applicationUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException(email));
         Set<SimpleGrantedAuthority> grantedAuthority = switch (applicationUser.getRole()) {
             case "ADMIN" -> ADMIN.getGrantedAuthority();
             case "EMPLOYEE" -> EMPLOYEE.getGrantedAuthority();

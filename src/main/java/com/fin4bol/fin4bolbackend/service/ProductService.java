@@ -27,16 +27,16 @@ public class ProductService {
     }
 
     public List<ProductJson> getProducts(final String token) {
-        final String userName = jwtTokenVerifier.extractUserEmail(token);
-        return getProductList(applicationUserService.findUserByUserName(userName))
+        final String email = jwtTokenVerifier.extractUserEmail(token);
+        return getProductList(applicationUserService.findUserByEmail(email))
                 .stream()
                 .map(this::mapProductToJson)
                 .toList();
     }
 
     public List<ProductJson> saveProduct(final String token, final ProductJson productJson) {
-        final String userName = jwtTokenVerifier.extractUserEmail(token);
-        final ApplicationUser applicationUser = applicationUserService.findUserByUserName(userName);
+        final String email = jwtTokenVerifier.extractUserEmail(token);
+        final ApplicationUser applicationUser = applicationUserService.findUserByEmail(email);
         Product productEntity = new Product();
         productEntity.setApplicationUserId(applicationUser);
         productEntity.setName(productJson.getName());
@@ -66,8 +66,8 @@ public class ProductService {
 
     @Transactional
     public List<ProductJson> deleteProduct(final String token, final String eanNumber) {
-        final String userName = jwtTokenVerifier.extractUserEmail(token);
-        final ApplicationUser applicationUser = applicationUserService.findUserByUserName(userName);
+        final String email = jwtTokenVerifier.extractUserEmail(token);
+        final ApplicationUser applicationUser = applicationUserService.findUserByEmail(email);
         productRepository.deleteProductsByApplicationUserIdAndEanNumber(applicationUser, eanNumber);
         return getProductList(applicationUser)
                 .stream()
@@ -77,8 +77,8 @@ public class ProductService {
 
     @Transactional
     public List<ProductJson> updateProduct(final String token, final ProductJson productJson) {
-        final String userName = jwtTokenVerifier.extractUserEmail(token);
-        final ApplicationUser applicationUser = applicationUserService.findUserByUserName(userName);
+        final String email = jwtTokenVerifier.extractUserEmail(token);
+        final ApplicationUser applicationUser = applicationUserService.findUserByEmail(email);
         Product product = productRepository.findByApplicationUserIdAndEanNumber(applicationUser, productJson.getEanNumber())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
         product.setUpdatedAt(LocalDateTime.now());

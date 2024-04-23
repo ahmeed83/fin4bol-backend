@@ -39,7 +39,7 @@ public class ApplicationUserService implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return applicationUserPrincipalRepository.findUserByUserName(email)
+        return applicationUserPrincipalRepository.findUserByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException(String.format("User email %s not found", email)));
     }
 
@@ -49,7 +49,7 @@ public class ApplicationUserService implements UserDetailsService {
      * @param applicationUser the new user
      */
     public void saveApplicationUser(ApplicationUserJson applicationUser) throws UserAuthenticationException {
-        if (userRepository.findByEmail(applicationUser.getEmail()).isPresent()) {
+        if (userRepository.findByEmail(applicationUser.getEmail().toLowerCase()).isPresent()) {
             throw new UserAlreadyExistsException();
         }
         if (!applicationUser.getPassword().equals(applicationUser.getPasswordConfirm())) {
@@ -70,7 +70,7 @@ public class ApplicationUserService implements UserDetailsService {
      * @param userName the userName
      * @return the user
      */
-    public ApplicationUser findUserByUserName(String userName) {
+    public ApplicationUser findUserByEmail(String userName) {
         return userRepository.findByEmail(userName)
                 .orElseThrow(() -> new UserNotFoundException(userName));
     }
