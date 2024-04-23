@@ -2,6 +2,8 @@ package com.fin4bol.fin4bolbackend.repository.entiry;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import lombok.Getter;
@@ -36,4 +38,10 @@ public class ApplicationUser extends BaseModel {
     private boolean isEnabled;
     private String provider;
     private String referralSource;
+
+    @PrePersist
+    @PreUpdate
+    private void prepareData(){
+        this.email = email == null ? null : email.toLowerCase();
+    }
 }

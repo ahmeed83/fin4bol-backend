@@ -47,7 +47,6 @@ public class JwtUserPassAuthFilter extends UsernamePasswordAuthenticationFilter 
      * @return Authentication
      * @throws AuthenticationException AuthenticationException
      */
-    @SneakyThrows
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
