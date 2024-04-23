@@ -4,8 +4,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,19 +21,18 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "APPLICATION_USER")
 public class ApplicationUser extends BaseModel {
 
-    @NotBlank(message = "Username is required")
-    @Column(unique = true)
-    private String userName;
-    @NotBlank(message = "Password is required")
-    private String password;
-    @NotBlank(message = "Password does not match")
-    @Transient
-    private String passwordConfirm;
-    @NotBlank(message = "Email is required")
+    @Column(unique = true, nullable = false, length = 100)
     private String email;
-    @NotBlank
+    @Column(nullable = false)
+    private String password;
+    @Transient
+    @Column(nullable = false)
+    private String passwordConfirm;
+    @Column(nullable = false)
+    private String name;
+    @Column(nullable = false)
     private String role;
-    @NotNull
+    @Column(nullable = false)
     private boolean isEnabled;
     private String provider;
     private String referralSource;

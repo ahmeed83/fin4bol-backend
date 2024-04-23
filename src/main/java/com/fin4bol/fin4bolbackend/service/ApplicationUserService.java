@@ -1,5 +1,8 @@
 package com.fin4bol.fin4bolbackend.service;
 
+import com.fin4bol.fin4bolbackend.configuration.security.jwt.json.ApplicationUserJson;
+import com.fin4bol.fin4bolbackend.exception.security.PasswordDoesNotMatchException;
+import com.fin4bol.fin4bolbackend.exception.security.UserAlreadyExistsException;
 import com.fin4bol.fin4bolbackend.exception.security.UserAuthenticationException;
 import com.fin4bol.fin4bolbackend.exception.security.UserNotFoundException;
 import com.fin4bol.fin4bolbackend.repository.ApplicationUserPrincipalRepository;
@@ -30,14 +33,14 @@ public class ApplicationUserService implements UserDetailsService {
     /**
      * Load the user form the database
      *
-     * @param userName userName
+     * @param email email
      * @return the loaded user
      * @throws UsernameNotFoundException UsernameNotFoundException
      */
     @Override
-    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-        return applicationUserPrincipalRepository.findUserByUserName(userName)
-                .orElseThrow(() -> new UsernameNotFoundException(String.format("UserName %s not found", userName)));
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        return applicationUserPrincipalRepository.findUserByUserName(email)
+                .orElseThrow(() -> new UsernameNotFoundException(String.format("User email %s not found", email)));
     }
 
     /**
@@ -45,8 +48,20 @@ public class ApplicationUserService implements UserDetailsService {
      *
      * @param applicationUser the new user
      */
-    public void saveApplicationUser(ApplicationUser applicationUser) throws UserAuthenticationException {
-        applicationUserPrincipalRepository.saveApplicationUser(applicationUser);
+    public void saveApplicationUser(ApplicationUserJson applicationUser) throws UserAuthenticationException {
+        if (userRepository.findByEmail(applicationUser.getEmail()).isPresent()) {
+            throw new UserAlreadyExistsException();
+        }
+        if (!applicationUser.getPassword().equals(applicationUser.getPasswordConfirm())) {
+            throw new PasswordDoesNotMatchException();
+        }
+        ApplicationUser user = ApplicationUser.builder()
+                .email(applicationUser.getEmail())
+                .password(applicationUser.getPassword())
+                .name(applicationUser.getName())
+                .referralSource(applicationUser.getReferralSource())
+                .build();
+        applicationUserPrincipalRepository.saveApplicationUser(user);
     }
 
     /**
@@ -56,7 +71,7 @@ public class ApplicationUserService implements UserDetailsService {
      * @return the user
      */
     public ApplicationUser findUserByUserName(String userName) {
-        return userRepository.findByUserName(userName)
+        return userRepository.findByEmail(userName)
                 .orElseThrow(() -> new UserNotFoundException(userName));
     }
 }

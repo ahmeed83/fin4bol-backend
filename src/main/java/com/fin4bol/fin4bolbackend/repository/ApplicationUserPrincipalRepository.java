@@ -1,8 +1,6 @@
 package com.fin4bol.fin4bolbackend.repository;
 
 import com.fin4bol.fin4bolbackend.configuration.security.auth.ApplicationUserPrincipal;
-import com.fin4bol.fin4bolbackend.exception.security.PasswordDoesNotMatchException;
-import com.fin4bol.fin4bolbackend.exception.security.UserAlreadyExistsException;
 import com.fin4bol.fin4bolbackend.exception.security.UserAuthenticationException;
 import com.fin4bol.fin4bolbackend.repository.entiry.ApplicationUser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +52,7 @@ public class ApplicationUserPrincipalRepository {
      * @return ApplicationUserPrincipal
      */
     public Optional<ApplicationUserPrincipal> findUserByUserName(String userName) {
-        final var applicationUser = userRepository.findByUserName(userName)
+        final var applicationUser = userRepository.findByEmail(userName)
                 .orElseThrow(() -> new UsernameNotFoundException(userName));
         Set<SimpleGrantedAuthority> grantedAuthority = switch (applicationUser.getRole()) {
             case "ADMIN" -> ADMIN.getGrantedAuthority();
@@ -62,7 +60,7 @@ public class ApplicationUserPrincipalRepository {
             case "CUSTOMER" -> CUSTOMER.getGrantedAuthority();
             default -> throw new IllegalStateException("Unknown Role name: " + applicationUser.getRole());
         };
-        return Optional.of(new ApplicationUserPrincipal(applicationUser.getUserName(), applicationUser.getPassword(),
+        return Optional.of(new ApplicationUserPrincipal(applicationUser.getEmail(), applicationUser.getPassword(),
                 grantedAuthority, applicationUser.isEnabled()));
     }
 
@@ -74,12 +72,6 @@ public class ApplicationUserPrincipalRepository {
      * @throws UserAuthenticationException user exception
      */
     public void saveApplicationUser(ApplicationUser applicationUser) throws UserAuthenticationException {
-        if (userRepository.findByUserName(applicationUser.getUserName()).isPresent()) {
-            throw new UserAlreadyExistsException();
-        }
-        if (!applicationUser.getPassword().equals(applicationUser.getPasswordConfirm())) {
-            throw new PasswordDoesNotMatchException();
-        }
         applicationUser.setEnabled(true);
         applicationUser.setCreatedAt(LocalDateTime.now());
         applicationUser.setPassword(passwordEncoder.encode(applicationUser.getPassword()));

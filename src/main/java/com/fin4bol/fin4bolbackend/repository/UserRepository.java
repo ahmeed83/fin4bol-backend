@@ -16,8 +16,8 @@ public interface UserRepository extends CrudRepository<ApplicationUser, UUID> {
     /**
      * Find user by name in the database.
      *
-     * @param userName userName
+     * @param email email
      * @return ApplicationUser
      */
-    Optional<ApplicationUser> findByUserName(String userName);
+    Optional<ApplicationUser> findByEmail(String email);
 }

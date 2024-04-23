@@ -1,13 +1,13 @@
 CREATE TABLE IF NOT EXISTS application_user
 (
-    id              UUID PRIMARY KEY NOT NULL,
-    created_at      TIMESTAMP        NOT NULL,
-    updated_at      TIMESTAMP,
-    user_name       VARCHAR(100)     NOT NULL,
-    email           VARCHAR(100)     NOT NULL,
-    password        VARCHAR(100)     NOT NULL,
-    provider        VARCHAR(100),
-    role            VARCHAR(10)      NOT NULL
+    id         UUID PRIMARY KEY    NOT NULL,
+    created_at TIMESTAMP           NOT NULL,
+    updated_at TIMESTAMP,
+    email      VARCHAR(100) UNIQUE NOT NULL,
+    name       VARCHAR(100)        NOT NULL,
+    password   VARCHAR(100)        NOT NULL,
+    provider   VARCHAR(100),
+    role       VARCHAR(10)         NOT NULL
         CHECK (role = 'ADMIN' OR
                role = 'EMPLOYEE' OR
                role = 'CUSTOMER'),
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS application_user
     referral_source VARCHAR(255)
 );
 
-CREATE UNIQUE INDEX user_name_upper_idx ON application_user (UPPER(user_name));
+CREATE UNIQUE INDEX email_upper_idx ON application_user (UPPER(email));
 
 CREATE TABLE product
 (

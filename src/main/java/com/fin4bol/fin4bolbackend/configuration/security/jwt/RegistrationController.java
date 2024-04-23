@@ -1,7 +1,8 @@
 package com.fin4bol.fin4bolbackend.configuration.security.jwt;
 
-import com.fin4bol.fin4bolbackend.repository.entiry.ApplicationUser;
+import com.fin4bol.fin4bolbackend.configuration.security.jwt.json.ApplicationUserJson;
 import com.fin4bol.fin4bolbackend.service.ApplicationUserService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,7 +26,7 @@ public class RegistrationController {
      * @return ResponseEntity
      */
     @PostMapping("sign-up")
-    public ResponseEntity<Void> registerNewUser(@RequestBody ApplicationUser newUser) {
+    public ResponseEntity<Void> registerNewUser(@Valid @RequestBody ApplicationUserJson newUser) {
         applicationUserService.saveApplicationUser(newUser);
         return ResponseEntity.ok().build();
     }

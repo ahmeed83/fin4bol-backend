@@ -27,7 +27,7 @@ public class ProductService {
     }
 
     public List<ProductJson> getProducts(final String token) {
-        final String userName = jwtTokenVerifier.extractUserName(token);
+        final String userName = jwtTokenVerifier.extractUserEmail(token);
         return getProductList(applicationUserService.findUserByUserName(userName))
                 .stream()
                 .map(this::mapProductToJson)
@@ -35,7 +35,7 @@ public class ProductService {
     }
 
     public List<ProductJson> saveProduct(final String token, final ProductJson productJson) {
-        final String userName = jwtTokenVerifier.extractUserName(token);
+        final String userName = jwtTokenVerifier.extractUserEmail(token);
         final ApplicationUser applicationUser = applicationUserService.findUserByUserName(userName);
         Product productEntity = new Product();
         productEntity.setApplicationUserId(applicationUser);
@@ -66,7 +66,7 @@ public class ProductService {
 
     @Transactional
     public List<ProductJson> deleteProduct(final String token, final String eanNumber) {
-        final String userName = jwtTokenVerifier.extractUserName(token);
+        final String userName = jwtTokenVerifier.extractUserEmail(token);
         final ApplicationUser applicationUser = applicationUserService.findUserByUserName(userName);
         productRepository.deleteProductsByApplicationUserIdAndEanNumber(applicationUser, eanNumber);
         return getProductList(applicationUser)
@@ -77,7 +77,7 @@ public class ProductService {
 
     @Transactional
     public List<ProductJson> updateProduct(final String token, final ProductJson productJson) {
-        final String userName = jwtTokenVerifier.extractUserName(token);
+        final String userName = jwtTokenVerifier.extractUserEmail(token);
         final ApplicationUser applicationUser = applicationUserService.findUserByUserName(userName);
         Product product = productRepository.findByApplicationUserIdAndEanNumber(applicationUser, productJson.getEanNumber())
                 .orElseThrow(() -> new RuntimeException("Product not found"));

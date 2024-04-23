@@ -34,7 +34,7 @@ public class PerformanceService {
     }
 
     public PerformanceRapportJson getSpecification(final String token, final String specificationId) {
-        final String userName = jwtTokenVerifier.extractUserName(token);
+        final String userName = jwtTokenVerifier.extractUserEmail(token);
         final ApplicationUser userByUserName = applicationUserService.findUserByUserName(userName);
         final PerformanceRapport performanceRapport =
                 performanceRapportRepository.findByIdAndApplicationUserId(UUID.fromString(specificationId), userByUserName)
@@ -43,7 +43,7 @@ public class PerformanceService {
     }
 
     public List<PerformanceRapportJson> getAllSpecifications(final String token) {
-        final String userName = jwtTokenVerifier.extractUserName(token);
+        final String userName = jwtTokenVerifier.extractUserEmail(token);
         final ApplicationUser userByUserName = applicationUserService.findUserByUserName(userName);
         List<PerformanceRapport> performanceRapport =
                 performanceRapportRepository.findAllByApplicationUserId(userByUserName)
@@ -54,7 +54,7 @@ public class PerformanceService {
     }
 
     public PerformanceRapportJson handleUploadSpecification(final String token, final MultipartFile specification) {
-        final String userName = jwtTokenVerifier.extractUserName(token);
+        final String userName = jwtTokenVerifier.extractUserEmail(token);
         final PerformanceRapport performanceRapport = excelMapperService.addPerformanceData(specification);
         performanceRapport.setApplicationUserId(applicationUserService.findUserByUserName(userName));
         performanceRapport.setCreatedAt(LocalDateTime.now());
@@ -65,7 +65,7 @@ public class PerformanceService {
 
     @Transactional
     public List<PerformanceRapportJson> deleteSpecification(final String token, final String specificationId) {
-        final String userName = jwtTokenVerifier.extractUserName(token);
+        final String userName = jwtTokenVerifier.extractUserEmail(token);
         final ApplicationUser userByUserName = applicationUserService.findUserByUserName(userName);
         performanceRapportRepository.deleteByIdAndApplicationUserId(UUID.fromString(specificationId), userByUserName);
         List<PerformanceRapport> performanceRapport =

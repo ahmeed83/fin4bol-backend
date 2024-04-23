@@ -56,7 +56,7 @@ public class JwtUserPassAuthFilter extends UsernamePasswordAuthenticationFilter 
                     new ObjectMapper().readValue(request.getInputStream(), UserPassAuthRequest.class);
 
             Authentication authentication =
-                    new UsernamePasswordAuthenticationToken(authenticationRequest.userName,
+                    new UsernamePasswordAuthenticationToken(authenticationRequest.email,
                             authenticationRequest.password);
             return authenticationManager.authenticate(authentication);
         } catch (IOException e) {
@@ -104,7 +104,6 @@ public class JwtUserPassAuthFilter extends UsernamePasswordAuthenticationFilter 
         response.addHeader(AUTHORIZATION, tokenPrefix + token);
     }
 
-    record UserPassAuthRequest(String userName, String password) {
+    record UserPassAuthRequest(String email, String password) {
     }
-
 }

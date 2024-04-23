@@ -88,7 +88,7 @@ public class JwtTokenVerifier extends OncePerRequestFilter {
      * @param bearerToken token
      * @return user name
      */
-    public String extractUserName(final String bearerToken) {
+    public String extractUserEmail(final String bearerToken) {
         final var tokenPrefix = jwtConfig.getTokenPrefix();
         final String token = bearerToken.replace(tokenPrefix, "");
         return Jwts.parser()
