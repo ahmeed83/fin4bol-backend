@@ -1,7 +1,9 @@
 package com.fin4bol.fin4bolbackend.controller;
 
 import com.fin4bol.fin4bolbackend.controller.json.ProductJson;
+import com.fin4bol.fin4bolbackend.controller.json.ProductUpdateJson;
 import com.fin4bol.fin4bolbackend.service.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -37,19 +39,19 @@ public class ProductController {
 
     @PostMapping()
     public ResponseEntity<List<ProductJson>> saveProduct(@RequestHeader(AUTHORIZATION) String token,
-                                            @RequestBody ProductJson product) {
+                                                         @Valid @RequestBody ProductJson product) {
         return ResponseEntity.ok(productService.saveProduct(token, product));
     }
 
     @DeleteMapping("/{ean-number}")
     public ResponseEntity<List<ProductJson>> deleteProduct(@RequestHeader(AUTHORIZATION) String token,
-                                                           @PathVariable("ean-number") String eanNumber) {
+                                                           @Valid @PathVariable("ean-number") String eanNumber) {
         return ResponseEntity.ok(productService.deleteProduct(token, eanNumber));
     }
 
     @PutMapping()
     public ResponseEntity<List<ProductJson>> updateProduct(@RequestHeader(AUTHORIZATION) String token,
-                                                           @RequestBody ProductJson productJson) {
-        return ResponseEntity.ok(productService.updateProduct(token, productJson));
+                                                           @Valid @RequestBody ProductUpdateJson productUpdateJson) {
+        return ResponseEntity.ok(productService.updateProduct(token, productUpdateJson));
     }
 }

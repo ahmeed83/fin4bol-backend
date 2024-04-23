@@ -2,6 +2,8 @@ package com.fin4bol.fin4bolbackend.service;
 
 import com.fin4bol.fin4bolbackend.configuration.security.jwt.JwtTokenVerifier;
 import com.fin4bol.fin4bolbackend.controller.json.ProductJson;
+import com.fin4bol.fin4bolbackend.controller.json.ProductUpdateJson;
+import com.fin4bol.fin4bolbackend.exception.product.ProductAlreadyExists;
 import com.fin4bol.fin4bolbackend.repository.ProductRepository;
 import com.fin4bol.fin4bolbackend.repository.entiry.ApplicationUser;
 import com.fin4bol.fin4bolbackend.repository.entiry.Product;
@@ -37,13 +39,17 @@ public class ProductService {
     public List<ProductJson> saveProduct(final String token, final ProductJson productJson) {
         final String email = jwtTokenVerifier.extractUserEmail(token);
         final ApplicationUser applicationUser = applicationUserService.findUserByEmail(email);
+        if (productRepository.findByApplicationUserIdAndEanNumber
+                (applicationUser, productJson.getEanNumber()).isPresent()) {
+            throw new ProductAlreadyExists();
+        }
         Product productEntity = new Product();
         productEntity.setApplicationUserId(applicationUser);
         productEntity.setName(productJson.getName());
         final LocalDateTime now = LocalDateTime.now();
         productEntity.setCreatedAt(now);
         productEntity.setUpdatedAt(now);
-        productEntity.setEanNumber(productJson.getToUpdateEanNumber());
+        productEntity.setEanNumber(productJson.getEanNumber());
         productEntity.setPurchaseCost(productJson.getPurchaseCost());
         productRepository.save(productEntity);
         return getProductList(applicationUser)
@@ -77,18 +83,18 @@ public class ProductService {
     }
 
     @Transactional
-    public List<ProductJson> updateProduct(final String token, final ProductJson productJson) {
+    public List<ProductJson> updateProduct(final String token, final ProductUpdateJson productUpdateJson) {
         final String email = jwtTokenVerifier.extractUserEmail(token);
         final ApplicationUser applicationUser = applicationUserService.findUserByEmail(email);
-        Product product = productRepository.findByApplicationUserIdAndEanNumber(applicationUser, productJson.getEanNumber())
+        Product product = productRepository.findByApplicationUserIdAndEanNumber(applicationUser, productUpdateJson.getEanNumber())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
         product.setUpdatedAt(LocalDateTime.now());
-        product.setName(productJson.getName() != null ? productJson.getName() : product.getName());
-        final String eanNumber = productJson.getEanNumber() != null ? productJson.getEanNumber() : product.getEanNumber();
+        product.setName(productUpdateJson.getName() != null ? productUpdateJson.getName() : product.getName());
+        final String eanNumber = productUpdateJson.getEanNumber() != null ? productUpdateJson.getEanNumber() : product.getEanNumber();
         final String eanNumberToBeUpdated =
-                productJson.getToUpdateEanNumber() != null ? productJson.getToUpdateEanNumber() : eanNumber;
+                productUpdateJson.getToUpdateEanNumber() != null ? productUpdateJson.getToUpdateEanNumber() : eanNumber;
         product.setEanNumber(eanNumberToBeUpdated);
-        product.setPurchaseCost(productJson.getPurchaseCost() != null ? productJson.getPurchaseCost() : product.getPurchaseCost());
+        product.setPurchaseCost(productUpdateJson.getPurchaseCost() != null ? productUpdateJson.getPurchaseCost() : product.getPurchaseCost());
         productRepository.save(product);
         return getProductList(applicationUser)
                 .stream()
