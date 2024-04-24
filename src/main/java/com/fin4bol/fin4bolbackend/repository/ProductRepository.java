@@ -36,4 +36,12 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
      * @return product
      */
     Optional<Product> findByApplicationUserIdAndEanNumber(ApplicationUser applicationUser, String eanNumber);
+
+    /**
+     * Find product by ean number.
+     *
+     * @param eanNumber ean number
+     * @return product
+     */
+    Optional<Product> findByEanNumber(String eanNumber);
 }
