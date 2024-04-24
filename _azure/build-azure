@@ -40,7 +40,7 @@ docker_build() {
     case $1 in
     snapshot)
         echo " >> docker tag image to azure: snapshot"
-        docker tag finance4bol-$1-$2 azizcode/finance4bol-snapshot:latest
+        docker tag finance4bol-$1-$2 azizcode/finance4bol-snapshot:$1-$2-$3
         ;;
     prd)
         echo " >> docker tag image to azure: prd"
@@ -52,12 +52,8 @@ docker_build() {
 docker_push() {
 case $1 in
     snapshot)
-        echo " >> docker push image: azizcode/finance4bol-snapshot:latest"
-        docker push azizcode/finance4bol-snapshot:latest
-        ;;
-    snapshot-deploy)
-        echo " >> docker push image: azizcode/finance4bol-snapshot:latest"
-        docker push azizcode/finance4bol-snapshot:latest
+        echo " >> docker push image: azizcode/finance4bol-snapshot:$1-$2-$3"
+        docker push azizcode/finance4bol-snapshot:$1-$2-$3
         az login
         echo " >> docker deployment on webapp service"
         az account set --subscription 558442db-ea39-4e94-8938-2b01b097ec03
@@ -65,7 +61,7 @@ case $1 in
         az webapp config container set \
           --name finance4bol-app-service \
           --resource-group finance4bol-resource-group \
-          --docker-custom-image-name azizcode/finance4bol-snapshot:latest \
+          --docker-custom-image-name azizcode/finance4bol-snapshot:$1-$2-$3 \
           --docker-registry-server-url https://index.docker.io
         ;;
     *)
@@ -81,12 +77,6 @@ esac
 
 case $1 in
 snapshot)
-    echo
-    echo "BUILD docker with version '$2' and image $TIMESTAMP"
-    echo
-    mvn -Dmaven.test.skip=true clean package
-    ;;
-snapshot-deploy)
     echo
     echo "BUILD docker with version '$2' and image $TIMESTAMP"
     echo

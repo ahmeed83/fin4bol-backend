@@ -70,8 +70,10 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3000",
-                                "https://finance4bolsa.blob.core.windows.net")
+                        .allowedOrigins(
+                                "http://localhost:3000",
+                                "https://finance4bolsa.blob.core.windows.net"
+                        )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .exposedHeaders("Authorization", "user")
