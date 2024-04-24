@@ -8,8 +8,8 @@ RUN mkdir /application && chown ahmed:ahmed /application
 
 USER ahmed
 
-COPY /application/fin4bol.jar /application/fin4bol.jar
+COPY /application/finance4bol.jar /application/finance4bol.jar
 
 WORKDIR /application
 
-ENTRYPOINT ["java", "-Duser.country=NL", "-Duser.language=nl", "-Duser.timezone=Europe/Amsterdam", "-Dspring.profiles.active=azure", "-Dserver.port=80", "-jar", "./fin4bol.jar"]
+ENTRYPOINT ["java", "-Duser.country=NL", "-Duser.language=nl", "-Duser.timezone=Europe/Amsterdam", "-Dspring.profiles.active=azure", "-Dserver.port=80", "-jar", "./finance4bol.jar"]

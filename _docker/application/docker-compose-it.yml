@@ -28,7 +28,7 @@ services:
       - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5015
       # - VALUE_OF_ACCOUNTAPI_APIKEY=${VALUE_OF_ACCOUNTAPI_APIKEY}
     volumes:
-      - ../../target/fin4bol.jar:/application/fin4bol.jar:ro
+      - ../../target/finance4bol.jar:/application/finance4bol.jar:ro
     restart: always
     depends_on:
       - database

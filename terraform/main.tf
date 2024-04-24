@@ -43,8 +43,7 @@ resource "azurerm_linux_web_app" "finance4bolAS" {
   site_config {
     always_on = true
     application_stack {
-      #docker_image_name        = "azizcode/finance4bol:latest"
-      docker_image_name        = "azizcode/finance4bol:snapshot-0.0.1-20240422T002705"
+      docker_image_name        = "azizcode/finance4bol-snapshot:latest"
       docker_registry_url      = "https://index.docker.io"
       docker_registry_username = "azizcode"
       docker_registry_password = "vuy3cfx@gwg0HME!jqj"
@@ -54,7 +53,7 @@ resource "azurerm_linux_web_app" "finance4bolAS" {
   app_settings = {
     "WEBSITES_ENABLE_APP_SERVICE_STORAGE" = "false" # For external Docker image use
     # Define other settings as required
-    "SPRING_DATASOURCE_URL"               = "jdbc:postgresql://${azurerm_postgresql_server.finance4bolPSQL.name}.postgres.database.azure.com:5432/finance4bol-db"
+    "SPRING_DATASOURCE_URL"               = "jdbc:postgresql://${azurerm_postgresql_server.finance4bolPSQL.name}.postgres.database.azure.com:5432/${azurerm_postgresql_database.finance4bolPSQL_DB.name}?sslmode=require"
     "SPRING_DATASOURCE_USERNAME"          = "${var.postgres_username}@${azurerm_postgresql_server.finance4bolPSQL.name}"
     "SPRING_DATASOURCE_PASSWORD"          = var.postgres_password
     "JWT_SECRET_KEY"                      = var.jwt_secret_key

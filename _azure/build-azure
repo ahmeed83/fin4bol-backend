@@ -32,20 +32,19 @@ docker_build() {
     [ -d _azure/target ] && rm -r _azure/target
     mkdir -p _azure/target/container/application/config
     cp _azure/config/Dockerfile _azure/target/container/
-    cp ./target/fin4bol.jar _azure/target/container/application/fin4bol.jar
+    cp ./target/finance4bol.jar _azure/target/container/application/finance4bol.jar
 
-    echo " >> docker build image: fin4bol-$2"
-    ( cd _azure/target || exit ; docker build --no-cache -t fin4bol-$1-$2 container)
+    echo " >> docker build image: finance4bol-$2"
+    ( cd _azure/target || exit ; docker build --no-cache -t finance4bol-$1-$2 container)
 
     case $1 in
     snapshot)
         echo " >> docker tag image to azure: snapshot"
-#        docker tag fin4bol-$1-$2 azizcode/fin4bol:$1-$2-$3
-        docker tag fin4bol-$1-$2 azizcode/fin4bol:latest
+        docker tag finance4bol-$1-$2 azizcode/finance4bol-snapshot:latest
         ;;
     prd)
         echo " >> docker tag image to azure: prd"
-        docker tag fin4bol-$1-$2 azizcode/fin4bol:$1-$2-$3
+        docker tag finance4bol-$1-$2 azizcode/finance4bol:$1-$2-$3
         ;;
     esac
 }
@@ -53,23 +52,27 @@ docker_build() {
 docker_push() {
 case $1 in
     snapshot)
-        echo " >> docker push image: azizcode/fin4bol:latest"
-        docker push azizcode/fin4bol:latest
+        echo " >> docker push image: azizcode/finance4bol-snapshot:latest"
+        docker push azizcode/finance4bol-snapshot:latest
+        ;;
+    snapshot-deploy)
+        echo " >> docker push image: azizcode/finance4bol-snapshot:latest"
+        docker push azizcode/finance4bol-snapshot:latest
         az login
         echo " >> docker deployment on webapp service"
         az account set --subscription 558442db-ea39-4e94-8938-2b01b097ec03
         az account list --output table | grep True
         az webapp config container set \
-          --name fin4bol \
+          --name finance4bol-app-service \
           --resource-group finance4bol-resource-group \
-          --docker-custom-image-name azizcode/fin4bol/fin4bol:latest \
+          --docker-custom-image-name azizcode/finance4bol-snapshot:latest \
           --docker-registry-server-url https://index.docker.io
         ;;
     *)
-        echo " >> docker push image: azizcode/fin4bol:$1-$2-$3"
-        docker push azizcode/fin4bol:$1-$2-$3
+        echo " >> docker push image: azizcode/finance4bol:$1-$2-$3"
+        docker push azizcode/finance4bol:$1-$2-$3
 #        echo " >> docker verify repository"
-#        az acr repository show-manifests --name azizcode --repository fin4bol --output table
+#        az acr repository show-manifests --name azizcode --repository finance4bol --output table
         echo "check"
         exit
         ;;
@@ -78,6 +81,12 @@ esac
 
 case $1 in
 snapshot)
+    echo
+    echo "BUILD docker with version '$2' and image $TIMESTAMP"
+    echo
+    mvn -Dmaven.test.skip=true clean package
+    ;;
+snapshot-deploy)
     echo
     echo "BUILD docker with version '$2' and image $TIMESTAMP"
     echo
