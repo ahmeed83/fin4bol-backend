@@ -3,6 +3,8 @@ package com.fin4bol.fin4bolbackend.configuration.security.jwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fin4bol.fin4bolbackend.configuration.security.config.JwtConfig;
 import com.fin4bol.fin4bolbackend.exception.security.CustomAuthenticationFailureHandler;
+import com.fin4bol.fin4bolbackend.repository.entiry.ApplicationUser;
+import com.fin4bol.fin4bolbackend.service.ApplicationUserService;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,13 +27,16 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
  */
 public class JwtUserPassAuthFilter extends UsernamePasswordAuthenticationFilter {
 
+    private final ApplicationUserService applicationUserService;
     private final AuthenticationManager authenticationManager;
     private final Key key;
     private final JwtConfig jwtConfig;
 
-    public JwtUserPassAuthFilter(AuthenticationManager authenticationManager,
-                                 Key key,
-                                 JwtConfig jwtConfig) {
+    public JwtUserPassAuthFilter(final ApplicationUserService applicationUserService,
+                                 final AuthenticationManager authenticationManager,
+                                 final Key key,
+                                 final JwtConfig jwtConfig) {
+        this.applicationUserService = applicationUserService;
         this.key = key;
         this.authenticationManager = authenticationManager;
         this.jwtConfig = jwtConfig;
@@ -100,6 +105,14 @@ public class JwtUserPassAuthFilter extends UsernamePasswordAuthenticationFilter 
                 .findFirst()
                 .ifPresent((role -> response.addHeader("user", role.getAuthority().substring(5).toLowerCase())));
         response.addHeader(AUTHORIZATION, tokenPrefix + token);
+
+        final ApplicationUser user = applicationUserService.findUserByEmail(authResult.getName());
+        response.setContentType("application/json");
+        try {
+            response.getWriter().write("{\"name\":\"" + user.getName() + "\"}");
+        } catch (IOException e) {
+            logger.error("Failed to write response", e);
+        }
     }
 
     record UserPassAuthRequest(String email, String password) {

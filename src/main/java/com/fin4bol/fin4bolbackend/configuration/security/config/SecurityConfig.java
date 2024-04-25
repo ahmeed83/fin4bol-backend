@@ -52,7 +52,8 @@ public class SecurityConfig {
                                 .authenticated()
                         )
                         .csrf(AbstractHttpConfigurer::disable)
-                        .addFilter(new JwtUserPassAuthFilter(authenticationManager(), secretKey, jwtConfig))
+                        .addFilter(new JwtUserPassAuthFilter(applicationUserService, authenticationManager(),
+                                secretKey, jwtConfig))
                         .addFilterAfter(new JwtTokenVerifier(jwtConfig, secretKey), JwtUserPassAuthFilter.class)
                         .sessionManagement((session) -> session
                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
