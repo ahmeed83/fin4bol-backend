@@ -77,7 +77,7 @@ public class SecurityConfig {
                         )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
-                        .exposedHeaders("Authorization", "user")
+                        .exposedHeaders("Authorization", "fin4bol_user_name", "fin4bol_user_type")
                         .allowCredentials(true);
             }
         };

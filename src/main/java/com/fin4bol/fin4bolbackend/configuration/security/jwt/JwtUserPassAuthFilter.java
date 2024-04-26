@@ -3,7 +3,6 @@ package com.fin4bol.fin4bolbackend.configuration.security.jwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fin4bol.fin4bolbackend.configuration.security.config.JwtConfig;
 import com.fin4bol.fin4bolbackend.exception.security.CustomAuthenticationFailureHandler;
-import com.fin4bol.fin4bolbackend.repository.entiry.ApplicationUser;
 import com.fin4bol.fin4bolbackend.service.ApplicationUserService;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
@@ -26,6 +25,9 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
  * This filter will be executed when the user tries to log in. It will generate a token and send it back to the user.
  */
 public class JwtUserPassAuthFilter extends UsernamePasswordAuthenticationFilter {
+
+    private static final String FIN_4_BOL_USER_NAME_HEADER = "fin4bol_user_name";
+    private static final String FIN_4_BOL_USER_TYPE_HEADER = "fin4bol_user_type";
 
     private final ApplicationUserService applicationUserService;
     private final AuthenticationManager authenticationManager;
@@ -103,16 +105,9 @@ public class JwtUserPassAuthFilter extends UsernamePasswordAuthenticationFilter 
                 .filter(x -> x.getAuthority() != null && x.getAuthority().length() > 5 && x.getAuthority()
                         .startsWith("ROLE_"))
                 .findFirst()
-                .ifPresent((role -> response.addHeader("user", role.getAuthority().substring(5).toLowerCase())));
+                .ifPresent((role -> response.addHeader(FIN_4_BOL_USER_TYPE_HEADER, role.getAuthority().substring(5).toLowerCase())));
         response.addHeader(AUTHORIZATION, tokenPrefix + token);
-
-        final ApplicationUser user = applicationUserService.findUserByEmail(authResult.getName());
-        response.setContentType("application/json");
-        try {
-            response.getWriter().write("{\"name\":\"" + user.getName() + "\"}");
-        } catch (IOException e) {
-            logger.error("Failed to write response", e);
-        }
+        response.addHeader(FIN_4_BOL_USER_NAME_HEADER, applicationUserService.findUserByEmail(authResult.getName()).getName());
     }
 
     record UserPassAuthRequest(String email, String password) {
