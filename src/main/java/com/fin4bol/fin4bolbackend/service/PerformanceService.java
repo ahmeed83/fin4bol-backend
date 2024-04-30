@@ -15,10 +15,11 @@ public class PerformanceService {
         this.performanceRepository = performanceRepository;
     }
 
-    public void updatePerformanceName(final ApplicationUser applicationUser,
-                                      final String eaNumber,
-                                      final String productName) {
-        final int updated = performanceRepository.updateProductName(applicationUser, eaNumber, productName);
+    public void updateProductName(final ApplicationUser applicationUser,
+                                  final String eaNumber,
+                                  final String productName,
+                                  final Double purchaseCost) {
+        final int updated = performanceRepository.updateProductName(applicationUser, eaNumber, productName, purchaseCost);
         if (updated == 0) {
             log.debug("No performance updated for user {} and ean {}", applicationUser.getId(), eaNumber);
         }

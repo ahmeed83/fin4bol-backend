@@ -26,11 +26,14 @@ public interface PerformanceRepository extends JpaRepository<Performance, UUID> 
     @Transactional
     @Query("""
              UPDATE Performance p
-             SET p.name = :productName
+             SET p.name = :productName,
+             p.purchaseCost = :purchaseCost,
+             p.updatedAt = CURRENT_TIMESTAMP
              WHERE p.performanceRapport.applicationUserId = :applicationUserId
              AND p.eanNumber = :eanNumber
             """)
     int updateProductName(@Param("applicationUserId") ApplicationUser applicationUserId,
                           @Param("eanNumber") String eanNumber,
-                          @Param("productName") String productName);
+                          @Param("productName") String productName,
+                          @Param("purchaseCost") Double purchaseCost);
 }

@@ -53,7 +53,8 @@ public class ProductService {
         productEntity.setEanNumber(productJson.getEanNumber());
         productEntity.setPurchaseCost(productJson.getPurchaseCost());
         productRepository.save(productEntity);
-        performanceService.updatePerformanceName(applicationUser, productJson.getEanNumber(), productJson.getName());
+        performanceService.updateProductName(applicationUser, productJson.getEanNumber(), productJson.getName(),
+                productJson.getPurchaseCost());
         return getProductList(applicationUser)
                 .stream()
                 .map(this::mapProductToJson)
@@ -65,6 +66,7 @@ public class ProductService {
         final String email = jwtTokenVerifier.extractUserEmail(token);
         final ApplicationUser applicationUser = applicationUserService.findUserByEmail(email);
         productRepository.deleteProductsByApplicationUserIdAndEanNumber(applicationUser, eanNumber);
+        performanceService.updateProductName(applicationUser, eanNumber, "Not found", 0.0);
         return getProductList(applicationUser)
                 .stream()
                 .map(this::mapProductToJson)
@@ -87,7 +89,8 @@ public class ProductService {
         product.setEanNumber(eanNumberToBeUpdated);
         product.setPurchaseCost(productUpdateJson.getPurchaseCost() != null ? productUpdateJson.getPurchaseCost() : product.getPurchaseCost());
         productRepository.save(product);
-        performanceService.updatePerformanceName(applicationUser, eanNumber, productUpdateJson.getName());
+        performanceService.updateProductName(applicationUser, eanNumber, productUpdateJson.getName(),
+                productUpdateJson.getPurchaseCost());
         return getProductList(applicationUser)
                 .stream()
                 .map(this::mapProductToJson)
