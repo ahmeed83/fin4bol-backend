@@ -1,7 +1,7 @@
 package com.fin4bol.fin4bolbackend.controller;
 
 import com.fin4bol.fin4bolbackend.controller.json.PerformanceRapportJson;
-import com.fin4bol.fin4bolbackend.service.PerformanceService;
+import com.fin4bol.fin4bolbackend.service.PerformanceReportService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,21 +21,21 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 @RequestMapping("/specification")
 public class SpecificationController {
 
-    PerformanceService performanceService;
+    PerformanceReportService performanceService;
 
-    public SpecificationController(PerformanceService performanceService) {
+    public SpecificationController(PerformanceReportService performanceService) {
         this.performanceService = performanceService;
     }
 
     @GetMapping()
     public ResponseEntity<List<PerformanceRapportJson>> getAllSpecifications(@RequestHeader(AUTHORIZATION) String token) {
-        return ResponseEntity.ok(performanceService.getAllSpecifications(token));
+        return ResponseEntity.ok(performanceService.getAllSpecificationReports(token));
     }
 
     @GetMapping("{specification-id}")
     public ResponseEntity<PerformanceRapportJson> getSpecification(@RequestHeader(AUTHORIZATION) String token,
                                                                    @PathVariable("specification-id") String specificationId) {
-        return ResponseEntity.ok(performanceService.getSpecification(token, specificationId));
+        return ResponseEntity.ok(performanceService.getSpecificationReport(token, specificationId));
     }
 
     @PostMapping("/upload")
@@ -48,6 +48,6 @@ public class SpecificationController {
     @DeleteMapping("{specification-id}")
     public ResponseEntity<List<PerformanceRapportJson>> deleteSpecification(@RequestHeader(AUTHORIZATION) String token,
                                                                             @PathVariable("specification-id") String specificationId) {
-        return ResponseEntity.ok(performanceService.deleteSpecification(token, specificationId));
+        return ResponseEntity.ok(performanceService.deleteSpecificationReport(token, specificationId));
     }
 }

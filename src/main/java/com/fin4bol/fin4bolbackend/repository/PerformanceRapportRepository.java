@@ -12,9 +12,28 @@ import java.util.UUID;
 @Repository
 public interface PerformanceRapportRepository extends JpaRepository<PerformanceRapport, UUID> {
 
-    List<PerformanceRapport> findAllByApplicationUserId(ApplicationUser applicationUser);
+    /**
+     * Find all performance reports by application user.
+     *
+     * @param applicationUser application user
+     * @return List of performance reports
+     */
+    List<PerformanceRapport> findAllByApplicationUserIdOrderByUpdatedAt(ApplicationUser applicationUser);
 
-    Optional<PerformanceRapport> findByIdAndApplicationUserId(UUID id, ApplicationUser applicationUser);
+    /**
+     * Find the performance report by id and application user.
+     *
+     * @param id              id
+     * @param applicationUser application user
+     * @return performance report
+     */
+    Optional<PerformanceRapport> findByIdAndApplicationUserIdOrderByUpdatedAt(UUID id, ApplicationUser applicationUser);
 
+    /**
+     * Delete the performance report by id and application user.
+     *
+     * @param id              id
+     * @param applicationUser application user
+     */
     void deleteByIdAndApplicationUserId(UUID id, ApplicationUser applicationUser);
 }
