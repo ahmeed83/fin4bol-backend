@@ -18,13 +18,16 @@ import java.util.List;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final PerformanceService performanceService;
     private final ApplicationUserService applicationUserService;
     private final JwtTokenVerifier jwtTokenVerifier;
 
     public ProductService(final ProductRepository productRepository,
+                          final PerformanceService performanceService,
                           final ApplicationUserService applicationUserService,
                           final JwtTokenVerifier jwtTokenVerifier) {
         this.productRepository = productRepository;
+        this.performanceService = performanceService;
         this.applicationUserService = applicationUserService;
         this.jwtTokenVerifier = jwtTokenVerifier;
     }
@@ -50,23 +53,11 @@ public class ProductService {
         productEntity.setEanNumber(productJson.getEanNumber());
         productEntity.setPurchaseCost(productJson.getPurchaseCost());
         productRepository.save(productEntity);
+        performanceService.updatePerformanceName(applicationUser, productJson.getEanNumber(), productJson.getName());
         return getProductList(applicationUser)
                 .stream()
                 .map(this::mapProductToJson)
                 .toList();
-    }
-
-    private List<Product> getProductList(final ApplicationUser applicationUser) {
-        return productRepository.findByApplicationUserIdOrderByUpdatedAt(applicationUser)
-                .orElseThrow(() -> new RuntimeException("Products not found"));
-    }
-
-    private ProductJson mapProductToJson(Product product) {
-        ProductJson productJson = new ProductJson();
-        productJson.setName(product.getName());
-        productJson.setEanNumber(product.getEanNumber());
-        productJson.setPurchaseCost(product.getPurchaseCost());
-        return productJson;
     }
 
     @Transactional
@@ -96,10 +87,24 @@ public class ProductService {
         product.setEanNumber(eanNumberToBeUpdated);
         product.setPurchaseCost(productUpdateJson.getPurchaseCost() != null ? productUpdateJson.getPurchaseCost() : product.getPurchaseCost());
         productRepository.save(product);
+        performanceService.updatePerformanceName(applicationUser, eanNumber, productUpdateJson.getName());
         return getProductList(applicationUser)
                 .stream()
                 .map(this::mapProductToJson)
                 .toList();
+    }
+
+    private List<Product> getProductList(final ApplicationUser applicationUser) {
+        return productRepository.findByApplicationUserIdOrderByUpdatedAt(applicationUser)
+                .orElseThrow(() -> new RuntimeException("Products not found"));
+    }
+
+    private ProductJson mapProductToJson(Product product) {
+        ProductJson productJson = new ProductJson();
+        productJson.setName(product.getName());
+        productJson.setEanNumber(product.getEanNumber());
+        productJson.setPurchaseCost(product.getPurchaseCost());
+        return productJson;
     }
 
     private void checkProductExistsForDifferentUser(final String eanNumber) {

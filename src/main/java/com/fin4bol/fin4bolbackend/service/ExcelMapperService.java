@@ -96,7 +96,7 @@ public class ExcelMapperService {
         performance.setCreatedAt(now);
         performance.setUpdatedAt(now);
         performance.setName(product.getName());
-        performance.setEanNumber(product.getEanNumber());
+        performance.setEanNumber(chosenEan);
         performance.setPurchaseCost(product.getPurchaseCost());
         final double totalRevenue = calculateTotalRevenuePerType(sheet, chosenEan, SALES_DESCRIPTION);
         performance.setRevenue(totalRevenue);
