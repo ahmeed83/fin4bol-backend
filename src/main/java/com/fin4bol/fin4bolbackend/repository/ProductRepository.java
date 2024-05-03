@@ -19,7 +19,7 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
      * @param applicationUser application user
      * @return List of products
      */
-    Optional<List<Product>> findByApplicationUserIdOrderByUpdatedAt(ApplicationUser applicationUser);
+    Optional<List<Product>> findByApplicationUserIdOrderByUpdatedAtDesc(ApplicationUser applicationUser);
 
     /**
      * Delete products by application user.
@@ -35,7 +35,7 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
      * @param eanNumber       ean number
      * @return product
      */
-    Optional<Product> findByApplicationUserIdAndEanNumber(ApplicationUser applicationUser, String eanNumber);
+    Optional<Product> findByApplicationUserIdAndEanNumberOrderByUpdatedAtDesc(ApplicationUser applicationUser, String eanNumber);
 
     /**
      * Find product by ean number.

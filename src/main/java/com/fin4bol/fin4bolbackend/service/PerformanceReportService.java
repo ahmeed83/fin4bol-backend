@@ -37,7 +37,7 @@ public class PerformanceReportService {
         final String email = jwtTokenVerifier.extractUserEmail(token);
         final ApplicationUser userByUserName = applicationUserService.findUserByEmail(email);
         final PerformanceRapport performanceRapport =
-                performanceRapportRepository.findByIdAndApplicationUserIdOrderByUpdatedAt(UUID.fromString(specificationId), userByUserName)
+                performanceRapportRepository.findByUserIdSortedByPerformanceUpdatedAtDesc(UUID.fromString(specificationId), userByUserName)
                         .orElseThrow(() -> new RuntimeException("Specification not found"));
         return mapPerformanceRapportToJson(performanceRapport);
     }
@@ -46,7 +46,7 @@ public class PerformanceReportService {
         final String email = jwtTokenVerifier.extractUserEmail(token);
         final ApplicationUser userByUserName = applicationUserService.findUserByEmail(email);
         List<PerformanceRapport> performanceRapport =
-                performanceRapportRepository.findAllByApplicationUserIdOrderByUpdatedAt(userByUserName)
+                performanceRapportRepository.findAllByApplicationUserIdOrderByUpdatedAtDesc(userByUserName)
                         .stream()
                         .limit(5)
                         .toList();
@@ -55,8 +55,9 @@ public class PerformanceReportService {
 
     public PerformanceRapportJson handleUploadSpecification(final String token, final MultipartFile specification) {
         final String email = jwtTokenVerifier.extractUserEmail(token);
-        final PerformanceRapport performanceRapport = excelMapperService.addPerformanceData(specification);
-        performanceRapport.setApplicationUserId(applicationUserService.findUserByEmail(email));
+        final ApplicationUser applicationUser = applicationUserService.findUserByEmail(email);
+        final PerformanceRapport performanceRapport = excelMapperService.addPerformanceData(applicationUser, specification);
+        performanceRapport.setApplicationUserId(applicationUser);
         performanceRapport.setCreatedAt(LocalDateTime.now());
         performanceRapport.setUpdatedAt(LocalDateTime.now());
         performanceRapportRepository.save(performanceRapport);
@@ -69,7 +70,7 @@ public class PerformanceReportService {
         final ApplicationUser userByUserName = applicationUserService.findUserByEmail(email);
         performanceRapportRepository.deleteByIdAndApplicationUserId(UUID.fromString(specificationId), userByUserName);
         List<PerformanceRapport> performanceRapport =
-                performanceRapportRepository.findAllByApplicationUserIdOrderByUpdatedAt(userByUserName)
+                performanceRapportRepository.findAllByApplicationUserIdOrderByUpdatedAtDesc(userByUserName)
                         .stream()
                         .limit(5)
                         .toList();

@@ -1,6 +1,7 @@
 package com.fin4bol.fin4bolbackend.service;
 
 import com.fin4bol.fin4bolbackend.repository.ProductRepository;
+import com.fin4bol.fin4bolbackend.repository.entiry.ApplicationUser;
 import com.fin4bol.fin4bolbackend.repository.entiry.Performance;
 import com.fin4bol.fin4bolbackend.repository.entiry.PerformanceRapport;
 import com.fin4bol.fin4bolbackend.repository.entiry.Product;
@@ -15,10 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -44,22 +42,22 @@ public class ExcelMapperService {
         this.productRepository = productRepository;
     }
 
-    public PerformanceRapport addPerformanceData(MultipartFile specification) {
+    public PerformanceRapport addPerformanceData(final ApplicationUser applicationUser,
+                                                 final MultipartFile specification) {
         try (Workbook workbook = WorkbookFactory.create(specification.getInputStream())) {
             Sheet sheet = workbook.getSheetAt(0);
             PerformanceRapport performanceRapport = new PerformanceRapport();
             setMainValues(sheet, performanceRapport);
-            setPerformanceList(sheet, performanceRapport);
+            setPerformanceList(applicationUser, sheet, performanceRapport);
             return performanceRapport;
         } catch (Exception e) {
             throw new RuntimeException(format("Failed to parse and analyze the Excel file %s", e.getMessage()));
         }
     }
 
-    private void setPerformanceList(final Sheet sheet,
+    private void setPerformanceList(final ApplicationUser applicationUser,
+                                    final Sheet sheet,
                                     final PerformanceRapport performanceRapport) {
-        Map<String, Product> productsByEan = productRepository.findAll().stream()
-                .collect(Collectors.toMap(Product::getEanNumber, Function.identity()));
         Set<String> existingEanList = new HashSet<>();
         for (Row row : sheet) {
             Cell cellB = row.getCell(1); // EAN txt
@@ -68,7 +66,9 @@ public class ExcelMapperService {
                 if (cellC != null) {
                     final String ean = cellC.getStringCellValue();
                     if (existingEanList.add(ean)) {
-                        Product product = productsByEan.getOrDefault(ean, notFoundProduct());
+                        final Product product =
+                                productRepository.findByApplicationUserIdAndEanNumberOrderByUpdatedAtDesc(applicationUser, ean)
+                                        .orElseGet(() -> createNewProduct(applicationUser, ean, row));
                         performanceRapport
                                 .getPerformanceList()
                                 .add(buildPerformance(sheet, product, ean, performanceRapport));
@@ -78,11 +78,24 @@ public class ExcelMapperService {
         }
     }
 
-    private Product notFoundProduct() {
+    private Product createNewProduct(final ApplicationUser applicationUser,
+                                     final String ean,
+                                     final Row row) {
         final Product product = new Product();
-        product.setName("Not found");
-        product.setEanNumber("Not found");
         product.setPurchaseCost(0.0);
+        product.setCreatedAt(LocalDateTime.now());
+        product.setUpdatedAt(LocalDateTime.now());
+        product.setApplicationUserId(applicationUser);
+
+        Cell cellD = row.getCell(3); // Product Name
+        if (cellD != null && cellD.getCellType() == CellType.STRING) {
+            product.setName(cellD.getStringCellValue());
+            product.setEanNumber(ean);
+        } else {
+            product.setName("Not found");
+            product.setEanNumber("Not found");
+        }
+        productRepository.save(product);
         return product;
     }
 

@@ -1,0 +1,11 @@
+@startuml
+start
+:upload specification;
+if (product exists) then (yes)
+  :use the name from the saved product;
+else (no)
+  :add new product and use its name;
+endif
+:go further with updating the specification;
+stop
+@enduml

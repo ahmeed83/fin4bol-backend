@@ -79,7 +79,7 @@ public class ProductService {
         final String email = jwtTokenVerifier.extractUserEmail(token);
         final ApplicationUser applicationUser = applicationUserService.findUserByEmail(email);
         Product product = productRepository
-                .findByApplicationUserIdAndEanNumber(applicationUser, productUpdateJson.getEanNumber())
+                .findByApplicationUserIdAndEanNumberOrderByUpdatedAtDesc(applicationUser, productUpdateJson.getEanNumber())
                 .orElseThrow(ProductNotFound::new);
         product.setUpdatedAt(LocalDateTime.now());
         product.setName(productUpdateJson.getName() != null ? productUpdateJson.getName() : product.getName());
@@ -98,7 +98,7 @@ public class ProductService {
     }
 
     private List<Product> getProductList(final ApplicationUser applicationUser) {
-        return productRepository.findByApplicationUserIdOrderByUpdatedAt(applicationUser)
+        return productRepository.findByApplicationUserIdOrderByUpdatedAtDesc(applicationUser)
                 .orElseThrow(() -> new RuntimeException("Products not found"));
     }
 
