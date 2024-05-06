@@ -111,37 +111,37 @@ public class ExcelMapperService {
         performance.setName(product.getName());
         performance.setEanNumber(chosenEan);
         performance.setPurchaseCost(product.getPurchaseCost());
-        final double totalRevenue = calculateTotalRevenuePerType(sheet, chosenEan, SALES_DESCRIPTION);
+        final double totalRevenue = calculateTotalPerType(sheet, chosenEan, SALES_DESCRIPTION) * -1;
         performance.setRevenue(totalRevenue);
         double countedSoldEans = countEan(sheet, chosenEan);
         performance.setSalesVolume((int) countedSoldEans);
         final double averagePricePerProduct = calculateAveragePricePerProduct(countedSoldEans, totalRevenue);
         performance.setAveragePricePerProduct(averagePricePerProduct);
         performance.setVat(calculateVat(countedSoldEans, averagePricePerProduct));
-        final double commission = calculateTotalRevenuePerType(sheet, chosenEan, COMMISSION_DESCRIPTION) * -1;
+        final double commission = calculateTotalPerType(sheet, chosenEan, COMMISSION_DESCRIPTION);
         performance.setCommission(commission);
-        final double commissionCorrection = calculateTotalRevenuePerType(sheet, chosenEan, COMMISSION_CORRECTION_DESCRIPTION);
+        final double commissionCorrection = calculateTotalPerType(sheet, chosenEan, COMMISSION_CORRECTION_DESCRIPTION) * -1;
         performance.setCommissionCorrection(commissionCorrection);
-        final double lostItemCompensation = calculateTotalRevenuePerType(sheet, chosenEan, LOST_ITEM_COMPENSATION_DESCRIPTION);
+        final double lostItemCompensation = calculateTotalPerType(sheet, chosenEan, LOST_ITEM_COMPENSATION_DESCRIPTION) * -1;
         performance.setLostItemCompensation(lostItemCompensation);
         performance.setNetCommission(commission - (commissionCorrection + lostItemCompensation));
         final Set<String> ordersByEan = calculateOrdersByEan(sheet, chosenEan);
         final Double shippingCost = calculateShipping(sheet, ordersByEan, SHIPPING_COST_DESCRIPTION);
         performance.setShippingCost(shippingCost);
-        final Double shippingCostCorrection = calculateShipping(sheet, ordersByEan, SHIPPING_COST_CORRECTION_DESCRIPTION);
+        final Double shippingCostCorrection = calculateShipping(sheet, ordersByEan, SHIPPING_COST_CORRECTION_DESCRIPTION) * -1;
         performance.setShippingCostCorrection(shippingCostCorrection);
         final Double bolComShippingLabelCost = calculateShipping(sheet, ordersByEan, SHIPPING_VIA_BOL_DESCRIPTION);
         performance.setBolComShippingLabelCost(bolComShippingLabelCost);
-        performance.setTotalShippingCost(shippingCost - (shippingCostCorrection + bolComShippingLabelCost) * -1);
-        final double unsellableInventoryCost = calculateTotalRevenuePerType(sheet, chosenEan, UNSELLABLE_INVENTORY_COSTS_DESCRIPTION) * -1;
+        performance.setTotalShippingCost(shippingCost - (shippingCostCorrection + bolComShippingLabelCost));
+        final double unsellableInventoryCost = calculateTotalPerType(sheet, chosenEan, UNSELLABLE_INVENTORY_COSTS_DESCRIPTION);
         performance.setUnsellableInventoryCost(unsellableInventoryCost);
-        final double pickPackCost = calculateTotalRevenuePerType(sheet, chosenEan, PICK_AND_PACK_COSTS_DESCRIPTION) * -1;
+        final double pickPackCost = calculateTotalPerType(sheet, chosenEan, PICK_AND_PACK_COSTS_DESCRIPTION);
         performance.setPickPackCost(pickPackCost);
-        final double pickPackCostCorrection = calculateTotalRevenuePerType(sheet, chosenEan, PICK_AND_PACK_CORRECTION_COSTS_DESCRIPTION);
+        final double pickPackCostCorrection = calculateTotalPerType(sheet, chosenEan, PICK_AND_PACK_CORRECTION_COSTS_DESCRIPTION) * -1;
         performance.setPickPackCostCorrection(pickPackCostCorrection);
-        performance.setNetPickPackCost(unsellableInventoryCost - (pickPackCost + pickPackCostCorrection) * -1);
-        performance.setInventoryCost(calculateTotalRevenuePerType(sheet, chosenEan, INVENTORY_COSTS_DESCRIPTION) * -1);
-        final double salesPriceCorrection = calculateTotalRevenuePerType(sheet, chosenEan, ITEMS_SALES_PRICE_CORRECTION_DESCRIPTION) * -1;
+        performance.setNetPickPackCost(unsellableInventoryCost + pickPackCost - pickPackCostCorrection);
+        performance.setInventoryCost(calculateTotalPerType(sheet, chosenEan, INVENTORY_COSTS_DESCRIPTION));
+        final double salesPriceCorrection = calculateTotalPerType(sheet, chosenEan, ITEMS_SALES_PRICE_CORRECTION_DESCRIPTION);
         performance.setSalesPriceCorrection(salesPriceCorrection);
         performance.setSalesPriceCorrectionVat(calculateVat(countedSoldEans, salesPriceCorrection));
         return performance;
@@ -192,9 +192,9 @@ public class ExcelMapperService {
         return countedSoldEans > 0 ? totalRevenue / countedSoldEans : 0;
     }
 
-    private double calculateTotalRevenuePerType(final Sheet sheet,
-                                                final String chosenEan,
-                                                final String description) {
+    private double calculateTotalPerType(final Sheet sheet,
+                                         final String chosenEan,
+                                         final String description) {
         double totalRevenue = 0;
         for (Row row : sheet) {
             Cell cellA = row.getCell(0); // Description
@@ -203,7 +203,7 @@ public class ExcelMapperService {
             if (cellA != null && description.equals(cellA.getStringCellValue()) &&
                     cellC != null && chosenEan.equals(cellC.getStringCellValue()) &&
                     cellJ != null && cellJ.getCellType() == CellType.NUMERIC) {
-                totalRevenue += cellJ.getNumericCellValue() * -1;
+                totalRevenue += cellJ.getNumericCellValue();
             }
         }
         return totalRevenue;
