@@ -144,6 +144,17 @@ public class ExcelMapperService {
         final double salesPriceCorrection = calculateTotalPerType(sheet, chosenEan, ITEMS_SALES_PRICE_CORRECTION_DESCRIPTION);
         performance.setSalesPriceCorrection(salesPriceCorrection);
         performance.setSalesPriceCorrectionVat(calculateVat(countedSoldEans, salesPriceCorrection));
+        performance.setProfit(
+                totalRevenue
+                - performance.getVat()
+                - commission + commissionCorrection + lostItemCompensation
+                - performance.getTotalShippingCost() + performance.getShippingCostCorrection()
+                - performance.getBolComShippingLabelCost()
+                - performance.getUnsellableInventoryCost()
+                - performance.getPickPackCost() + performance.getPickPackCostCorrection()
+                - performance.getInventoryCost()
+                - salesPriceCorrection + performance.getSalesPriceCorrectionVat()
+        );
         return performance;
     }
 

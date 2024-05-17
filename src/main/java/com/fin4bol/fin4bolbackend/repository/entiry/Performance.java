@@ -39,6 +39,7 @@ public class Performance extends BaseModel {
     private Double inventoryCost;
     private Double salesPriceCorrection;
     private Double salesPriceCorrectionVat;
+    private Double profit;
 
     @ManyToOne
     @JoinColumn(name = "performance_rapport_id", referencedColumnName = "id")

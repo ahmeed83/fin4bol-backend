@@ -26,5 +26,6 @@ public class PerformanceJson {
     private Double inventoryCost; // Voorraadkosten
     private Double salesPriceCorrection; // Correctie Verkoopprijs Artikelen
     private Double salesPriceCorrectionVat; // Correctie Verkoopprijs Artikelen BTW
+    private Double profit; // Winst
 }
 

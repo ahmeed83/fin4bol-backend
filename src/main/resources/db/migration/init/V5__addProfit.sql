@@ -1,0 +1,1 @@
+ALTER TABLE performance ADD COLUMN profit NUMERIC;

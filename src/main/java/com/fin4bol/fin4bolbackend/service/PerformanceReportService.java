@@ -115,6 +115,7 @@ public class PerformanceReportService {
                     performanceJson.setInventoryCost(performance.getInventoryCost());
                     performanceJson.setSalesPriceCorrection(performance.getSalesPriceCorrection());
                     performanceJson.setSalesPriceCorrectionVat(performance.getSalesPriceCorrectionVat());
+                    performanceJson.setProfit(performance.getProfit());
                     return performanceJson;
                 })
                 .toList());
