@@ -132,7 +132,7 @@ public class ExcelMapperService {
         performance.setShippingCostCorrection(shippingCostCorrection);
         final Double bolComShippingLabelCost = calculateShipping(sheet, ordersByEan, SHIPPING_VIA_BOL_DESCRIPTION);
         performance.setBolComShippingLabelCost(bolComShippingLabelCost);
-        performance.setTotalShippingCost(shippingCost - (shippingCostCorrection + bolComShippingLabelCost));
+        performance.setTotalShippingCost(shippingCost - shippingCostCorrection + bolComShippingLabelCost);
         final double unsellableInventoryCost = calculateTotalPerType(sheet, chosenEan, UNSELLABLE_INVENTORY_COSTS_DESCRIPTION);
         performance.setUnsellableInventoryCost(unsellableInventoryCost);
         final double pickPackCost = calculateTotalPerType(sheet, chosenEan, PICK_AND_PACK_COSTS_DESCRIPTION);
